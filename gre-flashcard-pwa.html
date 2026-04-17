@@ -100,7 +100,16 @@
 
   /* STUDY */
   #study { align-items:center; justify-content:center; padding:20px 16px; position:relative; }
-  .nav .study-progress { flex:1; display:flex; align-items:center; gap:8px; margin-left:10px; }
+  .study-top {
+    display:flex; align-items:center; justify-content:center; padding:8px 16px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+    background:var(--card); border-bottom:1px solid #333;
+  }
+  .study-top .study-progress { width:100%; max-width:400px; display:flex; align-items:center; gap:10px; }
+  .study-bottom {
+    display:flex; justify-content:flex-start; padding:6px 16px;
+    background:var(--bg);
+  }
   #study > .nav { justify-content:flex-start; }
   .study-progress {
     position:absolute; top:0; left:0; right:0;
@@ -263,12 +272,14 @@
 
 <!-- STUDY -->
 <div id="study" class="view">
-  <div class="nav">
-    <button class="nav-btn" onclick="quitStudy()">&#8592; 返回</button>
+  <div class="study-top">
     <div class="study-progress">
       <div class="bar"><div class="bar-fill" id="study-bar"></div></div>
       <div class="counter" id="study-counter">0/0</div>
     </div>
+  </div>
+  <div class="study-bottom">
+    <button class="nav-btn" onclick="quitStudy()">&#8592; 返回首页</button>
   </div>
   <div class="word-card" id="word-card">
     <div class="word-text" id="w-word">-</div>
