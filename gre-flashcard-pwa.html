@@ -676,7 +676,7 @@ updateHome();
 <script>
 if ('serviceWorker' in navigator) {
   const swCode = `
-    const CACHE = 'gre-flashcard-v1';
+    const CACHE = 'gre-flashcard-v2';
     self.addEventListener('install', e => self.skipWaiting());
     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => k.filter(k=>k!==CACHE).map(k=>caches.delete(k)))); });
     self.addEventListener('fetch', e => {
