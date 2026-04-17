@@ -99,14 +99,22 @@
   .big-btn.secondary { background:var(--card); border:1px solid #444; font-size:15px; letter-spacing:0; }
 
   /* STUDY */
-  #study { align-items:center; justify-content:center; padding:20px 16px; position:relative; }
+  #study { display:flex; flex-direction:column; position:relative; }
   .study-top {
+    flex-shrink:0;
     display:flex; flex-direction:column; align-items:flex-start; padding:10px 16px;
     padding-top: calc(10px + env(safe-area-inset-top));
     background:var(--card); border-bottom:1px solid #333;
   }
   .study-top .study-progress { width:100%; display:flex; align-items:center; gap:10px; margin-bottom:6px; }
   .study-back { font-size:12px; padding:4px 10px; align-self:flex-start; }
+
+  .study-body {
+    flex:1; display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:20px 16px; overflow-y:auto;
+    -webkit-overflow-scrolling:touch;
+  }
 
   .study-progress .bar { flex:1; height:4px; background:#333; border-radius:2px; }
   .study-progress .bar-fill { height:100%; background:var(--green); border-radius:2px; transition:width .3s; }
@@ -272,6 +280,7 @@
     </div>
     <button class="nav-btn study-back" onclick="quitStudy()">&#8592; 返回</button>
   </div>
+  <div class="study-body">
   <div class="word-card" id="word-card">
     <div class="word-text" id="w-word">-</div>
     <div class="word-phonetic">
@@ -289,6 +298,7 @@
     <button class="act-btn no" onclick="rate(0)">&#10060; 不认识</button>
   </div>
   <div class="shortcut-hint">键盘快捷键：Space 翻转 ｜ 1 认识 ｜ 2 模糊 ｜ 3 不认识 ｜ S 发音</div>
+  </div>
 </div>
 
 <!-- RESULT -->
