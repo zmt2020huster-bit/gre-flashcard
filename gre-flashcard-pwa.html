@@ -191,7 +191,8 @@
     display:flex; align-items:center; padding:12px 0; border-bottom:1px solid #222; gap:12px;
   }
   .list-item .idx { font-size:12px; color:#555; min-width:36px; }
-  .list-item .w { font-weight:600; font-size:15px; min-width:120px; }
+  .list-item .w { font-weight:600; font-size:15px; min-width:120px; cursor:pointer; }
+  .list-item .w:active { color:var(--accent); }
   .list-item .d { font-size:13px; color:var(--dim); flex:1; }
   .list-item .badge { font-size:11px; padding:2px 8px; border-radius:4px; white-space:nowrap; }
   .badge-know { background:rgba(78,204,163,0.2); color:var(--green); }
@@ -342,11 +343,11 @@
       <h4 style="color:var(--dim);font-size:13px;margin-bottom:10px;">&#128228; 数据同步</h4>
       <div style="display:flex;gap:8px;">
         <button class="danger-btn" style="flex:1;border-color:var(--green);color:var(--green);" onclick="exportData()">&#10515; 导出进度</button>
-        <label class="danger-btn" style="flex:1;border-color:#888;color:var(--text);margin-bottom:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;">
-          &#8629; 导入进度<input type="file" id="import-file" accept=".json,.md" style="display:none;" onchange="importData(this.files[0])">
-        </label>
+        <button class="danger-btn" id="btn-import" style="flex:1;border-color:#888;color:var(--text);margin-bottom:0;" onclick="triggerImport()">&#8629; 导入进度</button>
+        <input type="file" id="import-file" accept=".json,.md" style="display:none;">
       </div>
-      <p style="font-size:11px;color:#555;margin-top:6px;text-align:center;">导出 JSON 文件，可备份或通过 Obsidian/iCloud 同步多设备</p>
+      <p id="import-status" style="font-size:11px;color:var(--dim);margin-top:6px;text-align:center;min-height:16px;"></p>
+      <p style="font-size:11px;color:#555;margin-top:2px;text-align:center;">导出 JSON 文件，可备份或通过 Obsidian/iCloud 同步多设备</p>
     </div>
   </div>
 </div>
@@ -524,7 +525,7 @@ function _renderList() {
       :s===1?'<span class="badge badge-fuzzy">&#129300;</span>'
       :s===0?'<span class="badge badge-no">&#10060;</span>'
       :'<span class="badge badge-new">-</span>';
-    html+='<div class="list-item"><span class="idx">'+(i+1)+'</span><span class="w">'+w.w+'</span><span class="d">'+w.d+'</span>'+badge+'</div>';
+    html+='<div class="list-item"><span class="idx">'+(i+1)+'</span><span class="w" onclick="speakWord(\''+w.w+'\')" title="点击发音">'+w.w+' <span style="color:var(--dim);font-size:11px;font-weight:400;">/'+w.p+'/</span></span><span class="d">'+w.d+'</span>'+badge+'</div>';
     count++;
   }
   if(!html) html='<div class="list-empty">没有匹配的词</div>';
@@ -576,40 +577,80 @@ function exportData() {
   a.click(); URL.revokeObjectURL(url);
 }
 
+function triggerImport() {
+  const input = document.getElementById('import-file');
+  input.value = '';
+  input.onchange = function() {
+    if (this.files && this.files[0]) {
+      importData(this.files[0]);
+      this.value = '';
+    }
+  };
+  input.click();
+}
+
+function setImportStatus(msg, color) {
+  const el = document.getElementById('import-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.color = color || 'var(--dim)';
+}
+
 function importData(file) {
-  if (!file) return;
+  if (!file) { setImportStatus('未选择文件', 'var(--accent)'); return; }
+  setImportStatus('⏳ 正在读取文件...', '#f5a623');
   const reader = new FileReader();
   reader.onload = function(e) {
     try {
       let data;
-      // Support both JSON and Obsidian-style frontmatter MD
       if (file.name.endsWith('.md')) {
         data = parseObsidianNote(e.target.result);
       } else {
         data = JSON.parse(e.target.result);
       }
-      if (!data.progress) { alert('文件格式错误，无法导入'); return; }
-      if (confirm(`即将覆盖当前进度（${Object.keys(progress).length}条 → ${Object.keys(data.progress || {}).length}条），确定吗？`)) {
+      if (!data.progress) { setImportStatus('❌ 文件格式错误：缺少 progress 字段', 'var(--accent)'); alert('文件格式错误，无法导入'); return; }
+      const oldCount = Object.keys(progress).length;
+      const newCount = Object.keys(data.progress || {}).length;
+      if (confirm(`即将覆盖当前进度（${oldCount}条 → ${newCount}条），确定吗？`)) {
         progress = data.progress || {};
         settings = data.settings || settings;
         save(); saveS();
         updateHome(); closeSettings();
-        alert('✅ 导入成功！');
+        setImportStatus('', '');
+        setTimeout(() => alert(`✅ 导入成功！已恢复 ${newCount} 条学习进度`), 100);
+      } else {
+        setImportStatus('已取消导入', 'var(--dim)');
       }
     } catch(err) {
+      setImportStatus('❌ 解析失败: ' + err.message, 'var(--accent)');
       alert('❌ 文件解析失败：' + err.message);
     }
   };
+  reader.onerror = function() { setImportStatus('❌ 文件读取失败', 'var(--accent)'); };
   reader.readAsText(file);
 }
 
 // Parse Obsidian note format (JSON inside code block)
 function parseObsidianNote(text) {
-  // Try to find JSON in a code block
   const jsonMatch = text.match(/```(?:json)?\s*\n([\s\S]*?)\n```/);
   if (jsonMatch) return JSON.parse(jsonMatch[1]);
-  // Fallback: try parsing entire file as JSON
   return JSON.parse(text);
+}
+
+// Speak any word by text
+function speakWord(wordText) {
+  if (!wordText || wordText === '-') return;
+  if ('speechSynthesis' in window) {
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(wordText);
+    u.lang = 'en-US'; u.rate = settings.rate; u.pitch = 1;
+    const voices = speechSynthesis.getVoices();
+    const v = voices.find(v => v.lang.startsWith('en') && v.name.includes('Samantha'))
+      || voices.find(v => v.lang === 'en-US')
+      || voices.find(v => v.lang.startsWith('en'));
+    if (v) u.voice = v;
+    speechSynthesis.speak(u);
+  }
 }
 
 // ============ KEYBOARD ============
