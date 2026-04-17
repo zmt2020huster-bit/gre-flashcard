@@ -101,16 +101,15 @@
   /* STUDY */
   #study { align-items:center; justify-content:center; padding:20px 16px; position:relative; }
   .study-top {
-    display:flex; align-items:center; justify-content:center; padding:8px 16px;
-    padding-top: calc(8px + env(safe-area-inset-top));
+    display:flex; align-items:center; justify-content:center; padding:10px 16px;
+    padding-top: calc(10px + env(safe-area-inset-top));
     background:var(--card); border-bottom:1px solid #333;
   }
-  .study-top .study-progress { width:100%; max-width:400px; display:flex; align-items:center; gap:10px; }
+  .study-top .study-progress { width:100%; display:flex; align-items:center; gap:10px; }
   .study-bottom {
-    display:flex; justify-content:flex-start; padding:6px 16px;
-    background:var(--bg);
+    display:flex; justify-content:flex-start; padding:8px 16px;
   }
-  #study > .nav { justify-content:flex-start; }
+
   .study-progress {
     position:absolute; top:0; left:0; right:0;
     display:flex; align-items:center; padding:12px 16px; gap:12px;
@@ -692,7 +691,7 @@ updateHome();
 <script>
 if ('serviceWorker' in navigator) {
   const swCode = `
-    const CACHE = 'gre-flashcard-v2';
+    const CACHE = 'gre-flashcard-v3';
     self.addEventListener('install', e => self.skipWaiting());
     self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(k => k.filter(k=>k!==CACHE).map(k=>caches.delete(k)))); });
     self.addEventListener('fetch', e => {
