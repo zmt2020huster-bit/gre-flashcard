@@ -100,12 +100,12 @@
 
   /* STUDY */
   #study { align-items:center; justify-content:center; padding:20px 16px; position:relative; }
-  .study-nav {
-    display:flex; align-items:center; gap:10px; padding:8px 16px;
-    padding-top: calc(8px + env(safe-area-inset-top));
-    background:var(--card); border-bottom:1px solid #333; position:relative; z-index:100;
+  .study-header {
+    display:flex; align-items:center; gap:8px; padding:6px 16px;
+    padding-top: calc(6px + env(safe-area-inset-top));
+    background:var(--card); border-bottom:1px solid #333;
   }
-  .study-nav .study-progress { flex:1; display:flex; align-items:center; gap:8px; }
+  .study-header .study-progress { flex:1; display:flex; align-items:center; gap:8px; }
   .study-progress {
     position:absolute; top:0; left:0; right:0;
     display:flex; align-items:center; padding:12px 16px; gap:12px;
@@ -267,8 +267,8 @@
 
 <!-- STUDY -->
 <div id="study" class="view">
-  <div class="study-nav">
-    <button class="nav-btn" onclick="quitStudy()" style="font-size:12px;padding:5px 10px;">&#8592; 返回（保存进度）</button>
+  <div class="study-header">
+    <button onclick="quitStudy()" style="background:none;border:none;color:var(--dim);font-size:16px;cursor:pointer;padding:8px 4px;line-height:1;" title="返回首页">&#8592;</button>
     <div class="study-progress">
       <div class="bar"><div class="bar-fill" id="study-bar"></div></div>
       <div class="counter" id="study-counter">0/0</div>
@@ -326,29 +326,23 @@
 
 <!-- SETTINGS -->
 <div class="modal-overlay" id="settings-modal">
-  <div class="modal">
-    <h3>&#9881;&#65039; 设置</h3>
+  <div class="modal" style="position:relative;">
+    <button onclick="closeSettings()" style="position:absolute;top:12px;right:14px;background:none;border:none;color:#888;font-size:24px;line-height:1;cursor:pointer;z-index:10;padding:4px;" title="关闭">&#10005;</button>
+    <h3 style="margin-bottom:16px;">&#9881;&#65039; 设置</h3>
     <div class="config-row">
       <label>发音语速</label>
-      <input type="range" id="set-rate" min="0.5" max="1.5" step="0.1" value="0.8" style="flex:1;">
+      <input type="range" id="set-rate" min="0.5" max="1.5" step="0.1" value="0.8" style="flex:1;" oninput="document.getElementById('set-rate-val').textContent=this.value+'x';settings.rate=parseFloat(this.value);saveS();">
       <span id="set-rate-val">0.8x</span>
     </div>
     <div class="config-row">
       <label>自动发音</label>
-      <select id="set-auto-speak">
+      <select id="set-auto-speak" onchange="settings.autoSpeak=this.value==='1';saveS();">
         <option value="1">开</option>
         <option value="0">关</option>
       </select>
     </div>
-    <div class="modal-actions">
-      <button class="cancel" onclick="closeSettings()">关闭</button>
-      <button class="save" onclick="saveSettings()">保存</button>
-    </div>
-    <div class="danger-zone" style="padding:8px 12px;">
-      <button class="danger-btn" onclick="resetProgress()" style="font-size:11px;padding:6px 12px;opacity:0.6;">&#128465; 重置进度（危险）</button>
-    </div>
     <!-- Data Sync -->
-    <div class="danger-zone" style="margin-top:12px;">
+    <div class="danger-zone" style="margin-top:16px;">
       <h4 style="color:var(--dim);font-size:13px;margin-bottom:10px;">&#128228; 数据同步</h4>
       <div style="display:flex;gap:8px;">
         <button class="danger-btn" style="flex:1;border-color:var(--green);color:var(--green);" onclick="exportData()">&#10515; 导出进度</button>
