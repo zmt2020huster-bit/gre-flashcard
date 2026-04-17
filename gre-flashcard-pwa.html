@@ -100,6 +100,12 @@
 
   /* STUDY */
   #study { align-items:center; justify-content:center; padding:20px 16px; position:relative; }
+  .study-nav {
+    display:flex; align-items:center; gap:10px; padding:8px 16px;
+    padding-top: calc(8px + env(safe-area-inset-top));
+    background:var(--card); border-bottom:1px solid #333; position:relative; z-index:100;
+  }
+  .study-nav .study-progress { flex:1; display:flex; align-items:center; gap:8px; }
   .study-progress {
     position:absolute; top:0; left:0; right:0;
     display:flex; align-items:center; padding:12px 16px; gap:12px;
@@ -261,9 +267,12 @@
 
 <!-- STUDY -->
 <div id="study" class="view">
-  <div class="study-progress">
-    <div class="bar"><div class="bar-fill" id="study-bar"></div></div>
-    <div class="counter" id="study-counter">0/0</div>
+  <div class="study-nav">
+    <button class="nav-btn" onclick="quitStudy()" style="font-size:12px;padding:5px 10px;">&#8592; 返回（保存进度）</button>
+    <div class="study-progress">
+      <div class="bar"><div class="bar-fill" id="study-bar"></div></div>
+      <div class="counter" id="study-counter">0/0</div>
+    </div>
   </div>
   <div class="word-card" id="word-card">
     <div class="word-text" id="w-word">-</div>
@@ -335,8 +344,8 @@
       <button class="cancel" onclick="closeSettings()">关闭</button>
       <button class="save" onclick="saveSettings()">保存</button>
     </div>
-    <div class="danger-zone">
-      <button class="danger-btn" onclick="resetProgress()">&#128465;&#65039; 重置所有进度</button>
+    <div class="danger-zone" style="padding:8px 12px;">
+      <button class="danger-btn" onclick="resetProgress()" style="font-size:11px;padding:6px 12px;opacity:0.6;">&#128465; 重置进度（危险）</button>
     </div>
     <!-- Data Sync -->
     <div class="danger-zone" style="margin-top:12px;">
@@ -428,6 +437,12 @@ function buildBatch(mode, size) {
 }
 
 function shuffle(a) { for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]; } }
+
+function quitStudy() {
+  if (batchIdx > 0) { save(); }
+  currentBatch = []; batchIdx = 0;
+  showView('home');
+}
 
 function showWord() {
   if(batchIdx>=currentBatch.length) { showResult(); return; }
